@@ -31,7 +31,10 @@ export default function RegisterPage() {
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>, role: string) => {
+  const handleSubmit = (
+    e: React.FormEvent<HTMLFormElement>,
+    role: string
+  ) => {
     e.preventDefault();
     if (validateForm()) {
       toast.success(`Registered successfully as ${role}`);
@@ -55,7 +58,10 @@ export default function RegisterPage() {
         </h1>
 
         {/* Form */}
-        <form className="space-y-4">
+        <form
+          className="space-y-4"
+          onSubmit={(e) => handleSubmit(e, "Citizen")} // default Citizen
+        >
           <div>
             <input
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -95,7 +101,13 @@ export default function RegisterPage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               type="submit"
-              onClick={(e) => handleSubmit(e, "Citizen")}
+              onClick={(e) => {
+                e.preventDefault();
+                handleSubmit(
+                  e as unknown as React.FormEvent<HTMLFormElement>,
+                  "Citizen"
+                );
+              }}
               className="w-full bg-blue-600 text-white py-2 rounded-lg shadow hover:bg-blue-700 transition"
             >
               Register as Citizen
@@ -105,7 +117,13 @@ export default function RegisterPage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               type="submit"
-              onClick={(e) => handleSubmit(e, "Admin")}
+              onClick={(e) => {
+                e.preventDefault();
+                handleSubmit(
+                  e as unknown as React.FormEvent<HTMLFormElement>,
+                  "Admin"
+                );
+              }}
               className="w-full bg-green-600 text-white py-2 rounded-lg shadow hover:bg-green-700 transition"
             >
               Register as Admin

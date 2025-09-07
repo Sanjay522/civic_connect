@@ -1,22 +1,13 @@
-// src/controllers/issueController.ts
 import { Request, Response } from "express";
 import Issue, { IIssue } from "../models/Issue";
+import mongoose from "mongoose";
 
-// Create a new issue
 export const createIssue = async (req: Request, res: Response) => {
   try {
     const { title, description, category, location }: { title: string; description?: string; category: string; location: string } = req.body;
+    const userId = req.user?._id as mongoose.Types.ObjectId;
 
-    // @ts-ignore
-    const issue = await Issue.create({
-      title,
-      description,
-      category,
-      location,
-      // @ts-ignore
-      user: req.user._id, // make sure req.user is typed if using auth middleware
-    });
-
+    const issue = await Issue.create({ title, description, category, location, user: userId });
     res.json(issue);
   } catch (error) {
     console.error("Create issue error:", error);
@@ -24,11 +15,10 @@ export const createIssue = async (req: Request, res: Response) => {
   }
 };
 
-// Get issues of a specific user
 export const getUserIssues = async (req: Request, res: Response) => {
   try {
-    // @ts-ignore
-    const issues = await Issue.find({ user: req.user._id });
+    const userId = req.user?._id as mongoose.Types.ObjectId;
+    const issues = await Issue.find({ user: userId });
     res.json(issues);
   } catch (error) {
     console.error("Get user issues error:", error);
@@ -36,7 +26,6 @@ export const getUserIssues = async (req: Request, res: Response) => {
   }
 };
 
-// Get all issues (admin)
 export const getAllIssues = async (req: Request, res: Response) => {
   try {
     const issues = await Issue.find().populate("user", "name email");
@@ -47,7 +36,6 @@ export const getAllIssues = async (req: Request, res: Response) => {
   }
 };
 
-// Update issue status
 export const updateIssueStatus = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -65,7 +53,6 @@ export const updateIssueStatus = async (req: Request, res: Response) => {
   }
 };
 
-// Delete an issue
 export const deleteIssue = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

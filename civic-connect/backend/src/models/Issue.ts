@@ -1,7 +1,5 @@
-// src/models/Issue.ts
 import mongoose, { Document, Schema } from "mongoose";
 
-// Define Issue interface
 export interface IIssue extends Document {
   title: string;
   description?: string;
@@ -13,7 +11,6 @@ export interface IIssue extends Document {
   updatedAt?: Date;
 }
 
-// Create schema
 const issueSchema = new Schema<IIssue>(
   {
     title: { type: String, required: true },
@@ -26,8 +23,5 @@ const issueSchema = new Schema<IIssue>(
   { timestamps: true }
 );
 
-// Create model
 const Issue = mongoose.model<IIssue>("Issue", issueSchema);
-
-// Export default
 export default Issue;

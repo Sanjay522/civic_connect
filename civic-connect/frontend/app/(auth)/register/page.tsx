@@ -5,7 +5,13 @@ import Link from "next/link";
 import { toast, Toaster } from "react-hot-toast";
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    terms: false,
+  });
 
   const validateForm = () => {
     if (!form.name.trim()) {
@@ -20,12 +26,24 @@ export default function RegisterPage() {
       toast.error("Enter a valid email");
       return false;
     }
+    if (!form.phone.trim()) {
+      toast.error("Phone number is required");
+      return false;
+    }
+    if (!/^\d{10}$/.test(form.phone)) {
+      toast.error("Enter a valid 10-digit phone number");
+      return false;
+    }
     if (!form.password.trim()) {
       toast.error("Password is required");
       return false;
     }
     if (form.password.length < 6) {
       toast.error("Password must be at least 6 characters");
+      return false;
+    }
+    if (!form.terms) {
+      toast.error("You must agree to Terms & Conditions");
       return false;
     }
     return true;
@@ -62,6 +80,7 @@ export default function RegisterPage() {
           className="space-y-4"
           onSubmit={(e) => handleSubmit(e, "Citizen")} // default Citizen
         >
+          {/* Name */}
           <div>
             <input
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -73,6 +92,7 @@ export default function RegisterPage() {
             />
           </div>
 
+          {/* Email */}
           <div>
             <input
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -84,6 +104,19 @@ export default function RegisterPage() {
             />
           </div>
 
+          {/* Phone */}
+          <div>
+            <input
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Phone Number"
+              type="tel"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              required
+            />
+          </div>
+
+          {/* Password */}
           <div>
             <input
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -93,6 +126,21 @@ export default function RegisterPage() {
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               required
             />
+          </div>
+
+          {/* Terms & Conditions */}
+          <div className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={form.terms}
+              onChange={(e) => setForm({ ...form, terms: e.target.checked })}
+            />
+            <label>
+              I agree to the{" "}
+              <Link href="/terms" className="text-blue-600 hover:underline">
+                Terms & Conditions
+              </Link>
+            </label>
           </div>
 
           {/* Two Register Buttons */}

@@ -39,7 +39,7 @@ export default function LoginPage() {
 
       // ✅ Redirect based on role
       if (role === "Admin") {
-        router.push("/dashboard");
+        router.push("/admin");
       } else {
       router.push("/citizen"); // goes to app/citizen/page.tsx
       }

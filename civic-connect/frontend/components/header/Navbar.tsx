@@ -34,7 +34,7 @@ const Navbar = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full sticky top-0 z-50 flex flex-col lg:flex-row justify-between items-center px-6 py-4 shadow-md bg-white"
+      className="w-full sticky top-0 z-2000 flex flex-col lg:flex-row justify-between items-center px-6 py-4 shadow-md bg-white"
     >
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2 mb-4 lg:mb-0">
@@ -70,13 +70,13 @@ const Navbar = () => {
             </span>
 
             <motion.div whileHover={{ scale: 1.05 }}>
-              <Link href="/citizen" className="text-base lg:text-lg font-medium">
+              <Link href={user.role== "Admin" ? "/admin" : "/citizen"} className="text-base lg:text-lg font-medium">
                 Dashboard
               </Link>
             </motion.div>
 
             <motion.div whileHover={{ scale: 1.05 }}>
-              <Link href="/citizen/profile" className="text-base lg:text-lg font-medium">
+              <Link href={user.role== "Admin" ? "/admin/profile" : "/citizen/profile"} className="text-base lg:text-lg font-medium">
                 My Profile
               </Link>
             </motion.div>

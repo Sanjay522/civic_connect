@@ -25,14 +25,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   const login = async (email: string, password: string, role: "Citizen" | "Admin") => {
-    // ✅ Fake user
-    const fakeUser: User = {
-      id: "1",
-      name: role === "Admin" ? "Admin User" : "Citizen User",
-      email,
-      role,
+    // ✅ Fake credentials
+    const adminCredentials = {
+      email: "admin@example.com",
+      password: "admin123",
     };
-    setUser(fakeUser);
+
+    const citizenCredentials = {
+      email: "citizen@example.com",
+      password: "citizen123",
+    };
+
+    // Check role and credentials
+    if (
+      (role === "Admin" &&
+        email === adminCredentials.email &&
+        password === adminCredentials.password) ||
+      (role === "Citizen" &&
+        email === citizenCredentials.email &&
+        password === citizenCredentials.password)
+    ) {
+      const fakeUser: User = {
+        id: "1",
+        name: role === "Admin" ? "Admin User" : "Citizen User",
+        email,
+        role,
+      };
+      setUser(fakeUser);
+    } else {
+      alert("Invalid credentials");
+    }
   };
 
   const logout = () => {

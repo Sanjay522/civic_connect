@@ -4,8 +4,30 @@ import Image from "next/image";
 import siteimage from "@/public/siteimage.png";
 import CivicStats from "./Counter";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext"; // ✅ import auth context
 
 const SiteDescription = () => {
+  const router = useRouter();
+  const { user } = useContext(AuthContext); // ✅ get logged-in user
+
+  const handleReportClick = () => {
+    if (!user) {
+      router.push("/login"); // if not logged in
+    } else {
+      router.push("/citizen/create-issue"); // ✅ go to create issue page
+    }
+  };
+
+  const handleViewReportsClick = () => {
+    if (!user) {
+      router.push("/login");
+    } else {
+      router.push("/citizen/reports");
+    }
+  };
+
   return (
     <section className="py-12 md:py-16 bg-gray-100 flex flex-col lg:flex-row items-center justify-between gap-10 px-4 sm:px-6 lg:px-12">
       {/* Left section */}
@@ -51,6 +73,7 @@ const SiteDescription = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="w-full cursor-pointer sm:w-auto px-6 py-3 rounded-xl border border-gray-300 bg-white shadow hover:shadow-md transition text-blue-600 font-semibold"
+            onClick={handleReportClick}
           >
             Report an Issue
           </motion.button>
@@ -59,6 +82,7 @@ const SiteDescription = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="w-full cursor-pointer sm:w-auto px-6 py-3 rounded-xl border border-gray-300 bg-white shadow hover:shadow-md transition text-blue-600 font-semibold"
+            onClick={handleViewReportsClick}
           >
             View Reports
           </motion.button>

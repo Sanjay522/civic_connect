@@ -16,7 +16,6 @@ function LocationMarker({ setAddress, setPosition }: any) {
       const { lat, lng } = e.latlng;
       setPosition([lat, lng]);
 
-      // Reverse geocode with Nominatim
       fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
       )
@@ -54,7 +53,6 @@ export default function CreateIssuePage() {
 
   return (
     <div className="min-h-screen bg-gray-100 px-4 py-6">
-      {/* Header */}
       <div className="mb-6 flex items-center gap-2">
         <button
           onClick={() => window.history.back()}
@@ -67,9 +65,7 @@ export default function CreateIssuePage() {
         </h1>
       </div>
 
-      {/* Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Side - Map */}
         <div className="bg-white rounded-xl shadow-md p-4">
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
@@ -86,7 +82,7 @@ export default function CreateIssuePage() {
 
           <div className="w-full h-72 lg:h-96 rounded-lg overflow-hidden">
             <MapContainer
-              center={position || [20.5937, 78.9629]} // Default: India center
+              center={position || [20.5937, 78.9629]} 
               zoom={13}
               style={{ width: "100%", height: "100%" }}
             >
@@ -100,9 +96,7 @@ export default function CreateIssuePage() {
           </div>
         </div>
 
-        {/* Right Side - Form */}
         <div className="bg-white rounded-xl shadow-md p-6">
-          {/* Issue Title */}
           <div className="mb-5">
             <label className="block font-medium text-gray-700 mb-1">
               Issue Title <span className="text-red-500">*</span>
@@ -114,7 +108,6 @@ export default function CreateIssuePage() {
             />
           </div>
 
-          {/* Issue Type */}
           <div className="mb-5">
             <label className="block font-medium text-gray-700 mb-2">
               Issue Type <span className="text-red-500">*</span>
@@ -148,7 +141,6 @@ export default function CreateIssuePage() {
             </div>
           </div>
 
-          {/* Issue Location */}
           <div className="mb-5">
             <label className="block font-medium text-gray-700 mb-1">
               Issue Location Address
@@ -162,7 +154,6 @@ export default function CreateIssuePage() {
             />
           </div>
 
-          {/* Description */}
           <div className="mb-5">
             <label className="block font-medium text-gray-700 mb-1">
               Issue Description <span className="text-red-500">*</span>
@@ -174,7 +165,6 @@ export default function CreateIssuePage() {
             />
           </div>
 
-          {/* Upload Media */}
           <div className="mb-6">
             <label className="block font-medium text-gray-700 mb-1">
               Upload Media
@@ -185,7 +175,6 @@ export default function CreateIssuePage() {
             />
           </div>
 
-          {/* Submit Button */}
           <button className="w-full py-2 rounded-lg bg-blue-500 text-white font-semibold shadow-md hover:opacity-90 transition">
             Submit Issue
           </button>

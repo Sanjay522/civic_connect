@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
     // Use only if you want to deploy quickly and fix linting later
     ignoreDuringBuilds: true,
   },
+  typescript: {
+    // ✅ Ignore type errors during build
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;

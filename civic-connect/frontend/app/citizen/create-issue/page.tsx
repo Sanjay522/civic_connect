@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
+import { AuthContext } from "@/context/AuthContext";
+import "leaflet/dist/leaflet.css"; // ✅ Import Leaflet CSS
 
 const markerIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -14,6 +16,7 @@ function LocationMarker({ setAddress, setPosition }: any) {
   useMapEvents({
     click(e) {
       const { lat, lng } = e.latlng;
+      console.log("📍 Map clicked:", lat, lng); // ✅ Debug log
       setPosition([lat, lng]);
 
       fetch(
@@ -21,34 +24,87 @@ function LocationMarker({ setAddress, setPosition }: any) {
       )
         .then((res) => res.json())
         .then((data) => {
+          console.log("📍 Reverse geocode result:", data); // ✅ Debug log
           setAddress(data.display_name || `${lat}, ${lng}`);
-        });
+        })
+        .catch((err) => console.error("❌ Reverse geocode error:", err));
     },
   });
   return null;
 }
 
 export default function CreateIssuePage() {
+  const { raiseIssue } = useContext(AuthContext);
+
+  const [issueTitle, setIssueTitle] = useState("");
+  const [issueDescription, setIssueDescription] = useState("");
   const [issueType, setIssueType] = useState("Road Infrastructure");
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [address, setAddress] = useState("");
+  const [file, setFile] = useState<File | null>(null);
 
-  // Get Current Location
+  // ✅ Get Current Location
   const handleCurrentLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((pos) => {
-        const { latitude, longitude } = pos.coords;
-        setPosition([latitude, longitude]);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          console.log("📍 Current location:", latitude, longitude); // ✅ Debug log
+          setPosition([latitude, longitude]);
 
-        fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            setAddress(data.display_name || `${latitude}, ${longitude}`);
-          });
-      });
+          fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              console.log("📍 Reverse geocode (current location):", data); // ✅ Debug log
+              setAddress(data.display_name || `${latitude}, ${longitude}`);
+            })
+            .catch((err) =>
+              console.error("❌ Reverse geocode error (current location):", err)
+            );
+        },
+        (error) => {
+          console.error("❌ Geolocation error:", error);
+          alert("Unable to fetch your current location.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
     }
+  };
+
+  // ✅ Submit Issue
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!issueTitle || !issueDescription) {
+      alert("Please fill all required fields!");
+      return;
+    }
+
+  const imageUrl = file ? URL.createObjectURL(file) : "";
+
+
+    // Log data before submitting
+    console.log("📌 Issue Submitted:", {
+      title: issueTitle,
+      description: issueDescription,
+      type: issueType,
+      address,
+      position,
+      img:imageUrl,
+    });
+
+    raiseIssue(issueTitle, issueDescription, issueType, address, position, file);
+
+    alert("✅ Issue submitted successfully!");
+    setIssueTitle("");
+    setIssueDescription("");
+    setIssueType("Road Infrastructure");
+    setAddress("");
+    setPosition(null);
+    setFile(null);
   };
 
   return (
@@ -65,7 +121,11 @@ export default function CreateIssuePage() {
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+      >
+        {/* Left Side: Map */}
         <div className="bg-white rounded-xl shadow-md p-4">
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
@@ -73,6 +133,7 @@ export default function CreateIssuePage() {
               Select Issue Location
             </h2>
             <button
+              type="button"
               onClick={handleCurrentLocation}
               className="text-sm px-3 py-1 bg-blue-500 text-white rounded-lg hover:opacity-90"
             >
@@ -82,7 +143,7 @@ export default function CreateIssuePage() {
 
           <div className="w-full h-72 lg:h-96 rounded-lg overflow-hidden">
             <MapContainer
-              center={position || [20.5937, 78.9629]} 
+              center={position || [20.5937, 78.9629]}
               zoom={13}
               style={{ width: "100%", height: "100%" }}
             >
@@ -96,18 +157,23 @@ export default function CreateIssuePage() {
           </div>
         </div>
 
+        {/* Right Side: Form */}
         <div className="bg-white rounded-xl shadow-md p-6">
+          {/* Title */}
           <div className="mb-5">
             <label className="block font-medium text-gray-700 mb-1">
               Issue Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
+              value={issueTitle}
+              onChange={(e) => setIssueTitle(e.target.value)}
               placeholder="Enter your issue title"
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
             />
           </div>
 
+          {/* Type */}
           <div className="mb-5">
             <label className="block font-medium text-gray-700 mb-2">
               Issue Type <span className="text-red-500">*</span>
@@ -141,6 +207,7 @@ export default function CreateIssuePage() {
             </div>
           </div>
 
+          {/* Address */}
           <div className="mb-5">
             <label className="block font-medium text-gray-700 mb-1">
               Issue Location Address
@@ -154,32 +221,41 @@ export default function CreateIssuePage() {
             />
           </div>
 
+          {/* Description */}
           <div className="mb-5">
             <label className="block font-medium text-gray-700 mb-1">
               Issue Description <span className="text-red-500">*</span>
             </label>
             <textarea
               rows={3}
+              value={issueDescription}
+              onChange={(e) => setIssueDescription(e.target.value)}
               placeholder="Describe the issue in detail..."
               className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
             />
           </div>
 
+          {/* File Upload */}
           <div className="mb-6">
             <label className="block font-medium text-gray-700 mb-1">
               Upload Media
             </label>
             <input
               type="file"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
               className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100"
             />
           </div>
 
-          <button className="w-full py-2 rounded-lg bg-blue-500 text-white font-semibold shadow-md hover:opacity-90 transition">
+          {/* Submit */}
+          <button
+            type="submit"
+            className="w-full py-2 rounded-lg bg-blue-500 text-white font-semibold shadow-md hover:opacity-90 transition"
+          >
             Submit Issue
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

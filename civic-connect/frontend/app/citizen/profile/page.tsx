@@ -14,7 +14,6 @@ export default function CitizenProfile() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Citizen Profile</h1>
         <button
@@ -25,15 +24,12 @@ export default function CitizenProfile() {
         </button>
       </div>
 
-      {/* Profile Card */}
       <div className="bg-white shadow-md rounded-lg p-6 mb-6">
         <div className="flex items-center gap-4">
-          {/* Avatar */}
           <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xl font-bold">
             {user.name.charAt(0).toUpperCase()}
           </div>
 
-          {/* User Info */}
           <div>
             <p className="text-lg font-semibold text-gray-800">{user.name}</p>
             <p className="text-gray-600">{user.email}</p>
@@ -42,7 +38,6 @@ export default function CitizenProfile() {
         </div>
       </div>
 
-      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg shadow-md text-center">
           <p className="text-2xl font-bold text-gray-800">0</p>
@@ -62,7 +57,6 @@ export default function CitizenProfile() {
         </div>
       </div>
 
-      {/* Reported Issues */}
       <div className="bg-white shadow-md rounded-lg p-6">
         <h2 className="text-lg font-bold text-gray-800 mb-2">My Reported Issues</h2>
         <p className="text-gray-600">Track the status of all issues you’ve reported.</p>
@@ -71,3 +65,4 @@ export default function CitizenProfile() {
     </div>
   );
 }
+ 

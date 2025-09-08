@@ -1,51 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Edit, Trash2, Check } from "lucide-react";
-
-type Issue = {
-  id: number;
-  title: string;
-  location: string;
-  status: "Pending" | "In Progress" | "Resolved";
-};
+import { AuthContext } from "@/context/AuthContext";
 
 const AdminDashboard = () => {
+  const { issues, updateIssueStatus, user } = useContext(AuthContext);
+
+  console.log(issues)
+
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [issues, setIssues] = useState<Issue[]>([
-    { id: 1, title: "Broken Pipeline", location: "Old Bypass, Amravati, Maharashtra", status: "Pending" },
-    { id: 2, title: "Garbage Littered", location: "Paratwada Road, Amravati, Maharashtra", status: "In Progress" },
-    { id: 3, title: "Electric Pole", location: "Sai Nagar, Amravati, Maharashtra", status: "In Progress" },
-    { id: 4, title: "Potholes", location: "Patvipura, Amravati, Maharashtra", status: "Pending" },
-    { id: 5, title: "Broken road in front of my shop", location: "Tadimari, Andhra Pradesh", status: "Resolved" },
-  ]);
+  const [statusFilter, setStatusFilter] = useState<"All" | "Pending" | "In Progress" | "Resolved">("All");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
-  const handleStatusChange = (id: number, newStatus: Issue["status"]) => {
-    setIssues((prev) =>
-      prev.map((issue) =>
-        issue.id === id ? { ...issue, status: newStatus } : issue
-      )
+  if (!user || user.role !== "Admin") {
+    return (
+      <div className="px-6 py-6">
+        <h1 className="text-3xl font-bold text-red-600">Access Denied</h1>
+        <p className="text-gray-600">Only admins can access this dashboard.</p>
+      </div>
     );
-    setEditingId(null); // exit edit mode
-  };
+  }
 
-  const handleDelete = (id: number) => {
-    setIssues((prev) => prev.filter((issue) => issue.id !== id));
+  const handleStatusChange = (id: string, newStatus: "Pending" | "In Progress" | "Resolved") => {
+    updateIssueStatus(id, newStatus);
+    setEditingId(null);
   };
 
   const filteredIssues = issues.filter((issue) => {
-    const matchesSearch = issue.title.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch =
+      issue.title.toLowerCase().includes(search.toLowerCase()) ||
+      issue.address.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "All" ? true : issue.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
+  const formatDate = (date: Date) =>
+    new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(date));
+
   return (
     <div className="px-6 py-6">
-      {/* Heading */}
       <h1 className="text-3xl font-bold text-blue-700">Admin Dashboard</h1>
       <p className="text-gray-600 mb-6">Manage and resolve community issues</p>
 
@@ -86,7 +88,7 @@ const AdminDashboard = () => {
         <select
           className="border rounded-lg px-3 py-2 text-gray-700"
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e) => setStatusFilter(e.target.value as any)}
         >
           <option value="All">All Status</option>
           <option value="Pending">Pending</option>
@@ -101,7 +103,7 @@ const AdminDashboard = () => {
           <thead className="bg-gray-100 text-gray-600">
             <tr>
               <th className="p-3">Title</th>
-              <th className="p-3">Location</th>
+              <th className="p-3">Address</th>
               <th className="p-3">Status</th>
               <th className="p-3">Actions</th>
             </tr>
@@ -110,14 +112,14 @@ const AdminDashboard = () => {
             {filteredIssues.map((issue) => (
               <tr key={issue.id} className="border-t hover:bg-gray-50">
                 <td className="p-3 font-medium text-blue-700">{issue.title}</td>
-                <td className="p-3 text-gray-600">{issue.location}</td>
+                <td className="p-3 text-gray-600">{issue.address}</td>
                 <td className="p-3">
                   {editingId === issue.id ? (
                     <select
                       className="px-3 py-1 rounded-lg border text-sm"
                       value={issue.status}
                       onChange={(e) =>
-                        handleStatusChange(issue.id, e.target.value as Issue["status"])
+                        handleStatusChange(issue.id, e.target.value as "Pending" | "In Progress" | "Resolved")
                       }
                     >
                       <option value="Pending">Pending</option>
@@ -133,6 +135,7 @@ const AdminDashboard = () => {
                           ? "bg-blue-100 text-blue-700"
                           : "bg-green-100 text-green-700"
                       }`}
+                      onClick={() => setEditingId(issue.id)}
                     >
                       {issue.status}
                     </span>
@@ -156,13 +159,6 @@ const AdminDashboard = () => {
                       <Edit className="h-4 w-4 text-blue-600" />
                     </Button>
                   )}
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => handleDelete(issue.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </td>
               </tr>
             ))}
